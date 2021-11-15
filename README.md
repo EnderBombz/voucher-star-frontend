@@ -1,2 +1,2 @@
-# voucher-star-frontend
+# voucher-star-frontend-prototype
 Created with CodeSandbox

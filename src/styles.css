@@ -1,0 +1,24 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.grid-container {
+  text-align: center;
+  padding: 10px;
+}
+
+.grid-container #textfield {
+  margin-bottom: 10px;
+}
+
+.message-area {
+  margin: 10px auto 10px auto;
+  border: 1.5px solid rgba(253, 166, 52, 0.842);
+  border-radius: 5px;
+  background-color: rgba(129, 97, 27, 0.8);
+  color: aliceblue;
+  font-weight: lighter;
+  padding: 3px 1px 3px 1px;
+  font-size: 12px;
+}
