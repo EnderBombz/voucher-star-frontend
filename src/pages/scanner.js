@@ -71,7 +71,7 @@ export default function Main() {
             <QrReader
               ref={qrRef}
               delay={300}
-              style={{ width: "100%" }}
+              style={{ width: "100%",marginTop:'10px' }}
               onError={handleErrorFile}
               onScan={handleScanFile}
             />
