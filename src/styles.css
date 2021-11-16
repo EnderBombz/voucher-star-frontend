@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap");
+
 .App {
   font-family: sans-serif;
   text-align: center;
@@ -6,6 +8,15 @@
 .grid-container {
   text-align: center;
   padding: 10px;
+  font-family: "Poppins", sans-serif;
+}
+.grid-container h3 {
+  text-align: center;
+  padding: 10px;
+  font-family: "Poppins", sans-serif;
+}
+.grid-container-center {
+  text-align: center;
 }
 
 .grid-container #textfield {
@@ -21,4 +32,35 @@
   font-weight: lighter;
   padding: 3px 1px 3px 1px;
   font-size: 12px;
+}
+
+.message-area h4 {
+  font-family: "Poppins", sans-serif;
+}
+
+.card-center {
+  text-align: center;
+  padding: 40px;
+}
+.card-center #card {
+  width: 300px;
+  height: 450;
+}
+
+.main-logo {
+  width: 100%;
+  margin-top: 50px;
+  margin-bottom: 80px;
+  text-align: center;
+}
+.main-logo img {
+  width: 400px;
+}
+
+.main-button {
+  margin-bottom: 10px;
+  font-style: normal;
+}
+.voucher-list {
+  list-style: none;
 }

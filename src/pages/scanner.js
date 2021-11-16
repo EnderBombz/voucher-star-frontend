@@ -48,11 +48,41 @@ export default function Main() {
       }
     }
   };
-  /*const onScanFile = () => {
-    qrRef.current.openImageDialog();
-  };*/
+
   const toggleQrReader = () => {
+    setScan(null);
     setOpenReader(!openReader);
+  };
+
+  const color = () => {
+    const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+    const stringHex = "#" + randomColor;
+    return stringHex;
+  };
+
+  const lighter = (hex) => {
+    let r, g, b, longo;
+    hex = hex.replace("#", "");
+    longo = hex.length > 3;
+
+    r = longo
+      ? parseInt(hex.substr(0, 2), 16)
+      : parseInt(hex.substr(0, 1), 16) * 17;
+    g = longo
+      ? parseInt(hex.substr(2, 2), 16)
+      : parseInt(hex.substr(1, 1), 16) * 17;
+    b = longo
+      ? parseInt(hex.substr(4, 2), 16)
+      : parseInt(hex.substr(2, 1), 16) * 17;
+
+    let lighter = (r * 299 + g * 587 + b * 114) / 1000;
+
+    console.log(lighter);
+    if (lighter > 128) {
+      return "#000";
+    } else {
+      return "#fff";
+    }
   };
 
   return (
@@ -71,7 +101,7 @@ export default function Main() {
             <QrReader
               ref={qrRef}
               delay={300}
-              style={{ width: "100%",marginTop:'10px' }}
+              style={{ width: "100%", marginTop: "10px" }}
               onError={handleErrorFile}
               onScan={handleScanFile}
             />
@@ -80,20 +110,33 @@ export default function Main() {
           )}
           {scan ? (
             <>
-              <h3>ID:{scan._id}</h3>
-              <h3>Nome:{scan.userName}</h3>
+              <h3>ID: {scan._id}</h3>
+              <h3>Nome: {scan.userName}</h3>
               <h3>Terceiro: {scan.outsorced === true ? "Sim" : "Não"}</h3>
-              <h3>Area:{scan.area}</h3>
+              <h3>Area: {scan.area}</h3>
               <h4>Vouchers:</h4>
-              <ul>
-                {scan.vouchers.map((item) => {
-                  return (
-                    <>
-                      <li>{item}</li>
-                    </>
-                  );
-                })}
-              </ul>
+              <div className="grid-container-center">
+                <div className="voucher-list">
+                  {scan.vouchers.map((item) => {
+                    const randomColorHex = color();
+                    const light = lighter(randomColorHex);
+                    console.log(light);
+                    return (
+                      <div
+                        style={{
+                          borderRadius: "5px",
+                          marginBottom: 5,
+                          padding: 40,
+                          backgroundColor: randomColorHex,
+                          color: light
+                        }}
+                      >
+                        <li>{item}</li>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </>
           ) : (
             <></>

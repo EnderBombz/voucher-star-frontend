@@ -1,8 +1,11 @@
 import React, { useState, useRef } from "react";
 import QrReader from "react-qr-reader";
 import api from "../service/api";
+import ColabKeyCard from "../components/colabKeyCard";
 
 import { styled } from "@mui/material/styles";
+import download from "image-downloader";
+import downloadsFolder from "downloads-folder";
 
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
@@ -38,7 +41,16 @@ export default function Main() {
     try {
       setQueryMessage("");
       const response = await QRCode.toDataURL(JSON.stringify(qrData));
-      setQrCode(<img src={response} />);
+      const card = await api
+        .post("/users/generate-card", { QRCode: response, name: queryName })
+        .then((response) => {
+          return response.data;
+        });
+      setQrCode(
+        <>
+          <img id="card" src={card} />
+        </>
+      );
     } catch (err) {
       throw err;
     }
@@ -193,7 +205,9 @@ export default function Main() {
                 <h4>{queryMessage}</h4>
               </div>
             </div>
-            <div>{qrcode ? qrcode : <></>}</div>
+            <div>
+              {qrcode ? <div className="card-center">{qrcode}</div> : <></>}
+            </div>
           </Paper>
         </Grid>
       </Grid>
