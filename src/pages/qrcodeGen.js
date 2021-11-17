@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import QrReader from "react-qr-reader";
 import api from "../service/api";
 import ColabKeyCard from "../components/colabKeyCard";
+import BackBar from "./../components/navigation/backwardAppBar";
 
 import { styled } from "@mui/material/styles";
 import download from "image-downloader";
@@ -16,6 +17,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 
 import QRCode from "qrcode";
 import Checkbox from "@mui/material/Checkbox";
+import AlertModal from "../components/modal/alert";
 
 export default function Main() {
   const qrRef = useRef(null);
@@ -25,8 +27,16 @@ export default function Main() {
   const [name, setName] = useState("");
   const [area, setArea] = useState("");
   const [queryName, setQueryName] = useState("");
+  const [queryVoucherName, setQueryVoucherName] = useState("");
+  const [queryVoucherType, setQueryVoucherType] = useState("");
   const [sendMessage, setSendMessage] = useState("");
   const [queryMessage, setQueryMessage] = useState("");
+  const [voucherMessage, setVoucherMessage] = useState("");
+  const [list, setList] = useState([]);
+
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const handleOpenAlert = () => setOpenAlert(true);
+  const handleCloseAlert = () => setOpenAlert(false);
 
   function isJson(str) {
     try {
@@ -68,6 +78,14 @@ export default function Main() {
     console.log(value);
     setQueryName(value);
   };
+  const handleChangeVoucherName = (value) => {
+    console.log(value);
+    setQueryVoucherName(value);
+  };
+  const handleChangeVoucherType = (value) => {
+    console.log(value);
+    setQueryVoucherType(value);
+  };
 
   const handleChange = (event) => {
     setChecked(event.target.checked);
@@ -88,6 +106,27 @@ export default function Main() {
         });
     } else {
       setSendMessage("Preencha todos os campos");
+    }
+  };
+
+  const viewList = (list) => console.log(list);
+  const pushList = async () => {
+    if (queryVoucherName != "") {
+      let queryUpperCase = queryVoucherName.toUpperCase();
+      await api.get(`/users/getByName/${queryUpperCase}`).then((response) => {
+        if (response) {
+          if (response.data[0] != undefined) {
+            setList((list) => list.concat(response.data[0]));
+            viewList(list);
+          } else {
+            setVoucherMessage("Usuário não cadastrado");
+          }
+        } else {
+          setVoucherMessage("Usuário não cadastrado");
+        }
+      });
+    } else {
+      setVoucherMessage("Informe um nome");
     }
   };
 
@@ -115,19 +154,40 @@ export default function Main() {
         }
       });
     } else {
-      setSendMessage("Informe um nome");
+      setQueryMessage("Informe um nome");
+    }
+  };
+
+  const sendList = async () => {
+    try {
+      console.log(list);
+      let jsonList = await JSON.stringify(list);
+      api
+        .post("/users/voucher", { list: jsonList, voucher: queryVoucherType })
+        .then((response) => {
+          console.log("success to send data");
+          setQueryVoucherType("");
+          setList([]);
+        });
+    } catch (err) {
+      console.log(err);
     }
   };
 
   return (
     <>
+      <BackBar path="/" title="Escaner de QRcode" />
+      <AlertModal
+        open={openAlert}
+        handleClose={handleCloseAlert}
+        alert="Vouchers enviado com sucesso"
+      />
       <Grid container spacing={1} columns={8}>
         <Grid item xs={8}>
           <Paper>
             <div className="grid-container">
               <h1>Cadastro</h1>
               <div id="textfield">
-                {" "}
                 <TextField
                   id="outlined-basic"
                   label="Nome"
@@ -139,7 +199,6 @@ export default function Main() {
                 />
               </div>
               <div id="textfield">
-                {" "}
                 <TextField
                   id="outlined-basic"
                   label="Area"
@@ -207,6 +266,65 @@ export default function Main() {
             </div>
             <div>
               {qrcode ? <div className="card-center">{qrcode}</div> : <></>}
+            </div>
+          </Paper>
+        </Grid>
+        <Grid item xs={8} direction="column">
+          <Paper>
+            <div className="grid-container">
+              <h1>Adicionar Voucher</h1>
+              <TextField
+                id="outlined-basic"
+                label="Nome"
+                variant="outlined"
+                onChange={(e) => {
+                  handleChangeVoucherName(e.target.value);
+                }}
+                fullWidth
+              />
+
+              <Button
+                style={{ marginTop: "10px" }}
+                onClick={() => {
+                  pushList();
+                }}
+                variant="contained"
+                fullWidth
+              >
+                Adicionar a lista
+              </Button>
+              <div className={voucherMessage != "" ? "message-area" : ""}>
+                <h4>{voucherMessage}</h4>
+              </div>
+              {list.length != 0 ? (
+                <>
+                  {list.map((item) => (
+                    <h4>{item.userName}</h4>
+                  ))}
+                  <TextField
+                    id="outlined-basic"
+                    label="Qual brinde será entregue?"
+                    variant="outlined"
+                    onChange={(e) => {
+                      handleChangeVoucherType(e.target.value);
+                    }}
+                    fullWidth
+                  />
+                  <Button
+                    style={{ marginTop: "10px" }}
+                    onClick={() => {
+                      sendList();
+                      handleOpenAlert();
+                    }}
+                    variant="contained"
+                    fullWidth
+                  >
+                    Enviar Voucher
+                  </Button>
+                </>
+              ) : (
+                <></>
+              )}
             </div>
           </Paper>
         </Grid>

@@ -2,11 +2,27 @@ import React, { useState, useRef } from "react";
 import QrReader from "react-qr-reader";
 import api from "../service/api";
 import { Paper, Button } from "@mui/material";
+import BackBar from "./../components/navigation/backwardAppBar";
+
+import AlertModal from "../components/modal/alert";
+import QuestionModal from "../components/modal/question";
 
 export default function Main() {
   const [scan, setScan] = useState();
   const [openReader, setOpenReader] = useState(false);
   const qrRef = useRef(null);
+
+  const [currentData, setCurrentData] = useState();
+
+  const [openQuestion, setOpenQuestion] = React.useState(false);
+  const handleOpenQuestion = (item) => {
+    setOpenQuestion(true);
+    setCurrentData(item);
+  };
+  const handleCloseQuestion = () => {
+    setOpenQuestion(false);
+    setCurrentData(null);
+  };
 
   function isJson(str) {
     try {
@@ -16,6 +32,31 @@ export default function Main() {
     }
     return true;
   }
+
+  const updateVoucherList = async () => {
+    let newList = [];
+
+    scan.vouchers.map((item) => {
+      if (item != currentData) {
+        console.log(item);
+        newList.push(item);
+      }
+    });
+
+    const jsonList = JSON.stringify(newList);
+    const id = scan._id;
+    clearScan();
+    await api
+      .post("/users/update-voucher", { list: jsonList, id: id })
+      .then((response) => {
+        if (response) {
+          console.log(response.data);
+        }
+      });
+  };
+  const clearScan = () => {
+    setScan(null);
+  };
 
   const handleErrorFile = (error) => {
     console.log(error);
@@ -28,7 +69,7 @@ export default function Main() {
 
         console.log(jsonObj);
 
-        console.log(jsonObj.id);
+        console.log(jsonObj._id);
         await api.post("/users/check", { id: jsonObj._id }).then((response) => {
           console.log(response);
           if (response) {
@@ -50,7 +91,6 @@ export default function Main() {
   };
 
   const toggleQrReader = () => {
-    setScan(null);
     setOpenReader(!openReader);
   };
 
@@ -87,6 +127,17 @@ export default function Main() {
 
   return (
     <>
+      <BackBar path="/" title="Escaner de QRcode" />
+
+      <QuestionModal
+        open={openQuestion}
+        handleClose={handleCloseQuestion}
+        question={`Deseja liberar ${currentData}?`}
+        action={() => {
+          updateVoucherList();
+          handleCloseQuestion();
+        }}
+      />
       <Paper>
         <div className="grid-container">
           <Button
@@ -110,31 +161,38 @@ export default function Main() {
           )}
           {scan ? (
             <>
-              <h3>ID: {scan._id}</h3>
               <h3>Nome: {scan.userName}</h3>
               <h3>Terceiro: {scan.outsorced === true ? "Sim" : "Não"}</h3>
               <h3>Area: {scan.area}</h3>
-              <h4>Vouchers:</h4>
+              <h2>Vouchers:</h2>
               <div className="grid-container-center">
                 <div className="voucher-list">
-                  {scan.vouchers.map((item) => {
-                    const randomColorHex = color();
-                    const light = lighter(randomColorHex);
-                    console.log(light);
-                    return (
-                      <div
-                        style={{
-                          borderRadius: "5px",
-                          marginBottom: 5,
-                          padding: 40,
-                          backgroundColor: randomColorHex,
-                          color: light
-                        }}
-                      >
-                        <li>{item}</li>
-                      </div>
-                    );
-                  })}
+                  {scan.vouchers.length > 0 ? (
+                    scan.vouchers.map((item) => {
+                      const randomColorHex = color();
+                      const light = lighter(randomColorHex);
+                      console.log(light);
+                      return (
+                        <div
+                          onClick={() => {
+                            handleOpenQuestion(item);
+                          }}
+                          style={{
+                            borderRadius: "5px",
+                            marginBottom: 5,
+                            padding: 40,
+                            backgroundColor: randomColorHex,
+                            color: light,
+                            cursor: "pointer"
+                          }}
+                        >
+                          <li>{item}</li>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <h5>O usuário não possuí Vouchers</h5>
+                  )}
                 </div>
               </div>
             </>

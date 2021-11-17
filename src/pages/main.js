@@ -1,15 +1,16 @@
 import React from "react";
 import voucherLogo from "./../images/VOUCHER_STAR_LOGO.png";
 import { Button } from "@mui/material";
-import history from "./../history/history";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Main() {
+  const navigate = useNavigate();
+
   const handleScanner = () => {
-    history.push("/scanner");
+    navigate("/scanner");
   };
   const handleGenerator = () => {
-    history.push("/generator");
+    navigate("/generator");
   };
 
   return (
@@ -19,31 +20,27 @@ export default function Main() {
       </div>
       <div>
         <div className="main-button">
-          <Link to="/scanner">
-            <Button
-              onClick={() => {
-                handleScanner();
-              }}
-              variant="contained"
-              fullWidth
-            >
-              Scanner
-            </Button>
-          </Link>
+          <Button
+            onClick={() => {
+              handleScanner();
+            }}
+            variant="contained"
+            fullWidth
+          >
+            Scanner
+          </Button>
         </div>
         <div className="main-button">
-          <Link to="/generator" className="main-button">
-            <Button
-              className="main-button"
-              onClick={() => {
-                return;
-              }}
-              variant="contained"
-              fullWidth
-            >
-              Generator
-            </Button>
-          </Link>
+          <Button
+            className="main-button"
+            onClick={() => {
+              handleGenerator();
+            }}
+            variant="contained"
+            fullWidth
+          >
+            Generator
+          </Button>
         </div>
       </div>
     </>

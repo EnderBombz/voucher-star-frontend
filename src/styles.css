@@ -9,10 +9,10 @@
   text-align: center;
   padding: 10px;
   font-family: "Poppins", sans-serif;
+  margin-top: 100px;
 }
 .grid-container h3 {
-  text-align: center;
-  padding: 10px;
+  text-align: left;
   font-family: "Poppins", sans-serif;
 }
 .grid-container-center {
